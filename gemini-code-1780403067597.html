@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイズアプリ</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        button { display: block; width: 100%; padding: 15px; margin: 10px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; }
+        #result { margin-top: 20px; font-weight: bold; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <h2 id="question">読み込み中...</h2>
+    <div id="options"></div>
+    <div id="result" class="hidden"></div>
+    <button id="next-btn" class="hidden" onclick="nextQuestion()">次へ</button>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "1. コンパニオン診断に用いられるのはどれか。",
+            o: ["PSA", "血小板凝集能", "EGFR変異解析", "75g経口グルコース負荷試験", "T細胞サブセット"],
+            a: 2,
+            ex: "EGFR変異解析は、特定の分子標的薬の効果を予測するためのコンパニオン診断として用いられます。"
+        },
+        {
+            q: "2. 混濁尿は透明化処理で鑑別が可能である。正しい組合せはどれか。",
+            o: ["加温：細菌", "3％酢酸：リン酸塩", "10％塩酸：尿酸塩", "10％水酸化カリウム：脂肪", "アルコール・エーテル混合液：シュウ酸塩"],
+            a: 1,
+            ex: "リン酸塩は3%酢酸で溶解し、尿酸塩は加温で溶解、脂肪はアルコール・エーテルで溶解します。"
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('question').innerText = q.q;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        q.o.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i);
+            optionsDiv.appendChild(btn);
+        });
+        document.getElementById('result').classList.add('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function checkAnswer(idx) {
+        const q = questions[currentIdx];
+        const resDiv = document.getElementById('result');
+        resDiv.classList.remove('hidden');
+        if (idx === q.a) {
+            score++;
+            resDiv.innerText = "正解！ " + q.ex;
+            resDiv.style.color = "green";
+        } else {
+            resDiv.innerText = "不正解… " + q.ex;
+            resDiv.style.color = "red";
+        }
+        document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-container').innerHTML = `<h2>終了！</h2><p>正解率: ${Math.round(score/questions.length*100)}%</p><button onclick="location.reload()">もう一度</button>`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
